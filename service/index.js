@@ -1,7 +1,7 @@
-const Contact = require("../service/schemas/contacts");
+const { Contact } = require("../service/schemas/contacts");
 
 const listContacts = async () => {
-  return Contact.find();
+  return Contact.find({});
 };
 
 const getContactByID = async (id) => {
@@ -13,7 +13,6 @@ const removeContact = async (id) => {
 };
 
 const addContact = async (data) => {
-  // Schema
   return Contact.create(data);
 };
 

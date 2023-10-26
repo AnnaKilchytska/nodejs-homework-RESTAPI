@@ -80,7 +80,7 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await service.updateContact(id);
+    const result = await service.updateContact(id, req.body);
 
     if (!result) throw new Error("Couldn't remove contact");
 
@@ -96,10 +96,24 @@ const updateContact = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await service.updateContact(id, req.body);
+
+    if (!result) throw new Error("Couldn't remove contact");
+
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   listContacts,
   getContactByID,
   removeContact,
   addContact,
   updateContact,
+  updateStatus,
 };
