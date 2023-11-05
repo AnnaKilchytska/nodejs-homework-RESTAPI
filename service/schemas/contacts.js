@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
+const { handleMongooseError } = require("../../middlewares");
 
 const contactsSchema = new Schema({
   name: {
@@ -16,7 +17,13 @@ const contactsSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+  },
 });
+
+contactsSchema.post("save", handleMongooseError);
 
 const updateFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required(),
