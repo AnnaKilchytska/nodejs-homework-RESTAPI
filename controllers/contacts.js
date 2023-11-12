@@ -2,7 +2,9 @@ const service = require("../service/index");
 
 const listContacts = async (req, res, next) => {
   try {
-    const contacts = await service.listContacts();
+    const { _id: owner } = req.user;
+
+    const contacts = await service.listContacts({ owner });
     res.json({
       status: "success",
       code: 200,
@@ -60,7 +62,9 @@ const removeContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const result = await service.addContact(req.body);
+    const { _id: owner } = req.user;
+
+    const result = await service.addContact({ ...req.body, owner });
 
     res.status(201).json({
       status: "success",

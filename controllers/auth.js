@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const { User } = require("../models/user");
+const HttpError = require("../helpers/HTTPError");
 
 const { SECRET_KEY } = process.env;
 
@@ -12,7 +13,8 @@ const register = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user) {
-      res.status(409).json({ message: "This email is already in use!" });
+      // res.status(409).json({ message: "This email is already in use!" });
+      throw HttpError(409, { message: "This email is already in use!" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -51,7 +53,9 @@ const login = async (req, res) => {
 
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
 
-    await User.findByIdAndUpdate(user._id, token);
+    console.log(user._id);
+
+    await User.findByIdAndUpdate(user._id, { token });
 
     res.status(200).json({
       status: "success",

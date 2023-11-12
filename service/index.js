@@ -1,7 +1,7 @@
 const { Contact } = require("../service/schemas/contacts");
 
-const listContacts = async () => {
-  return Contact.find({});
+const listContacts = async (data) => {
+  return Contact.find(data, "-createAt -updateAt");
 };
 
 const getContactByID = async (id) => {
