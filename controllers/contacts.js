@@ -9,12 +9,16 @@ const listContacts = async (req, res, next) => {
     const { page = 1, limit = 4 } = req.query;
     const skip = (page - 1) * limit;
 
-    // const favorite = req.query.favorite;
+    const favorite = req.query.favorite;
 
-    const contacts = await Contact.find({ owner }, "-createAt -updateAt", {
-      skip,
-      limit,
-    }).populate("owner", "name email");
+    const contacts = await Contact.find(
+      { owner, favorite: favorite ?? [true, false] },
+      "-createAt -updateAt",
+      {
+        skip,
+        limit,
+      }
+    ).populate("owner", "name email");
 
     res.json({
       status: "success",
