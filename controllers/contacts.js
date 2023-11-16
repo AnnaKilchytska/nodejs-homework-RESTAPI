@@ -1,8 +1,25 @@
-const service = require("../service/index");
+// const service = require("../service/index");
+const { Contact } = require("../service/schemas/contacts");
 
 const listContacts = async (req, res, next) => {
   try {
-    const contacts = await service.listContacts();
+    const { _id: owner } = req.user;
+
+    console.log(req.query);
+    const { page = 1, limit = 4 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const favorite = req.query.favorite;
+
+    const contacts = await Contact.find(
+      { owner, favorite: favorite ?? [true, false] },
+      "-createAt -updateAt",
+      {
+        skip,
+        limit,
+      }
+    ).populate("owner", "name email");
+
     res.json({
       status: "success",
       code: 200,
@@ -19,7 +36,7 @@ const listContacts = async (req, res, next) => {
 const getContactByID = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await service.getContactByID(id);
+    const result = await Contact.findOne({ _id: id });
 
     if (!result) {
       res.status(404).json({ message: "Contact not found" });
@@ -42,7 +59,7 @@ const removeContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const result = await service.removeContact(id);
+    const result = await Contact.findByIdAndRemove({ _id: id });
     if (!result) throw new Error("Couldn't remove contact");
 
     res.json({
@@ -60,8 +77,9 @@ const removeContact = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const result = await service.addContact(req.body);
+    const { _id: owner } = req.user;
 
+    const result = await Contact.create({ ...req.body, owner });
     res.status(201).json({
       status: "success",
       code: 201,
@@ -80,7 +98,7 @@ const addContact = async (req, res, next) => {
 const updateContact = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await service.updateContact(id, req.body);
+    const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!result) throw new Error("Couldn't remove contact");
 
@@ -99,7 +117,7 @@ const updateContact = async (req, res) => {
 const updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await service.updateContact(id, req.body);
+    const result = await Contact.findByIdAndUpdate(id, req.body);
 
     if (!result) throw new Error("Couldn't remove contact");
 
